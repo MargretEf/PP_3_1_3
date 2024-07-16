@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .info {
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .info strong {
+            display: inline-block;
+            width: 100px;
+            color: #555;
+        }
+        .roles {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .roles span {
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            padding: 2px 5px;
+            margin: 2px;
+        }
+        .logout-button {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .logout-button:hover {
+            background-color: #c9302c;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>User Information</h1>
+    <div class="info">
+        <strong>Name:</strong> <span th:text="${#authentication.principal.name}">Name</span>
+    </div>
+    <div class="info">
+        <strong>Last Name:</strong> <span th:text="${#authentication.principal.lastname}">Last Name</span>
+    </div>
+    <div class="info">
+        <strong>Age:</strong> <span th:text="${#authentication.principal.age}">Age</span>
+    </div>
+    <div class="info">
+        <strong>Email:</strong> <span th:text="${#authentication.principal.email}">Email</span>
+
+    <div class="info">
+        <strong>Roles:</strong>
+        <div class="roles">
+            <span th:each="role : ${#authentication.authorities}" th:text="${role.authority}">Role</span>
+        </div>
+    </div>
+    <form th:action="@{/logout}" th:method="POST">
+        <input type="submit" value="Logout" class="logout-button">
+    </form>
+</div>
+</body>

@@ -23,7 +23,6 @@ public class PersonValidator implements Validator {
         return User.class.equals(clazz
         );
     }
-//Проверяем есть ли пользователь,лучше создать пипол сервер и на нем создать проверяющий метод
     @Override
     public void validate(Object target, Errors errors) {
         User person =(User)target;

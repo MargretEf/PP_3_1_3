@@ -56,22 +56,18 @@ public class PersonDetails implements UserDetails{
     public boolean isAccountNonExpired() {
         return true;
     }
-    //тот аккаунт не заблкирован
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
-    //этот аккаунт пороль не вышел срок
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
-    //он работает
     @Override
     public boolean isEnabled() {
         return true;
     }
-
     public User getPerson() {
         return this.user;
     }

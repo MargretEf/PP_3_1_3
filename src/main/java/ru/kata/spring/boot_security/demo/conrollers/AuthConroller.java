@@ -73,7 +73,7 @@ peopleService.register(user);
             return "auth/edit";
         }
 
-    @PostMapping("/edit")
+    @PatchMapping("/edit")
     public String showEditUser(@ModelAttribute("showUser") User user) {
         Set<Role> roles = new HashSet<>();
         for (Role role : user.getRole()) {

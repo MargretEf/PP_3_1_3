@@ -12,4 +12,6 @@ public interface PeopleService {
     List<User> getAllUsers();
     User getUser(long id);
     void deleteUser(long id);
+    public void register (User user);
+    public void save(User user);
 }

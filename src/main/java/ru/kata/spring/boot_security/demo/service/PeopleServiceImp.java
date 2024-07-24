@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.models.User;
@@ -12,9 +13,11 @@ import java.util.List;
 
 public class PeopleServiceImp implements PeopleService {
 
-   private PeopleRepository peopleRepository;
+   private final PeopleRepository peopleRepository;
+   private final PasswordEncoder passwordEncoder;
     @Autowired
-    public PeopleServiceImp(PeopleRepository peopleService) {
+    public PeopleServiceImp(PeopleRepository peopleService, PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
         this.peopleRepository =peopleService;
     }
 
@@ -39,4 +42,16 @@ public class PeopleServiceImp implements PeopleService {
         ;
 
     }
+    @Transactional
+    @Override
+    public void register(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        peopleRepository.save(user);
+    }
+    @Transactional
+    @Override
+    public void save(User user) {
+        peopleRepository.save(user);
+    }
+
 }

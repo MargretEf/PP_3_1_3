@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.conrollers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -9,9 +10,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
-import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.service.PeopleService;
-import ru.kata.spring.boot_security.demo.service.RegistrationService;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.util.PersonValidator;
 
 import java.util.HashSet;
@@ -23,14 +23,14 @@ import java.util.Set;
 public class AuthConroller {
 
     private final PersonValidator personValidator;
-    private final RegistrationService registrationService;
-    private RoleRepository roleRepository;
-    private PeopleService peopleService;
+    private final RoleService roleService;
+    private final PeopleService peopleService;
+    @Autowired
+    private  PasswordEncoder passwordEncoder;
 @Autowired
-    public AuthConroller(PersonValidator personValidator, RegistrationService registrationService,RoleRepository roleRepository,PeopleService peopleService) {
+    public AuthConroller(PersonValidator personValidator,RoleService roleService,PeopleService peopleService) {
         this.personValidator = personValidator;
-        this.registrationService = registrationService;
-        this.roleRepository = roleRepository;
+        this.roleService = roleService;
         this.peopleService = peopleService;
     }
     @GetMapping("/users")
@@ -44,7 +44,7 @@ public class AuthConroller {
     public String registration(Model model) {
         User user = new User();
         model.addAttribute("person", user);
-        List<Role> roles = (List<Role>) roleRepository.findAll();
+        List<Role> roles = (List<Role>) roleService.findAll();
         model.addAttribute("allRoles", roles);
 
         return "auth/registration";
@@ -57,10 +57,10 @@ public class AuthConroller {
         }
         Set<Role> roles = new HashSet<>();
         for (Role role : user.getRole()) {
-            roles.add(roleRepository.findById(role.getId()).get());
+            roles.add(roleService.findById(role.getId()).get());
         }
         user.setRole(roles);
-registrationService.register(user);
+peopleService.register(user);
         return "redirect:/admin/users";
     }
 
@@ -68,7 +68,7 @@ registrationService.register(user);
     public String showEditUser(Model model, @RequestParam(value = "id") long id) {
     User user = peopleService.getUser(id);
             model.addAttribute("showUser", user);
-        List<Role> roles = (List<Role>) roleRepository.findAll();
+        List<Role> roles = (List<Role>) roleService.findAll();
         model.addAttribute("allRoles", roles);
             return "auth/edit";
         }
@@ -77,10 +77,19 @@ registrationService.register(user);
     public String showEditUser(@ModelAttribute("showUser") User user) {
         Set<Role> roles = new HashSet<>();
         for (Role role : user.getRole()) {
-            roles.add(roleRepository.findById(role.getId()).orElse(null));
+            roles.add(roleService.findById(role.getId()).orElse(null));
         }
         user.setRole(roles);
-        registrationService.register(user);
+        String password = user.getPassword();
+        String encode = passwordEncoder.encode(password);
+        var currentPassword = peopleService.getUser(user.getId()).getPassword();
+        if (password.equals(currentPassword)) {
+            peopleService.save(user);
+        } else {
+            user.setPassword(encode);
+            peopleService.save(user);
+        }
+
         return "redirect:/admin/users";
     }
 

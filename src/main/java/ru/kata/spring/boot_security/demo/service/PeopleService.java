@@ -14,4 +14,6 @@ public interface PeopleService {
     void deleteUser(long id);
     public void register (User user);
     public void save(User user);
+    public void edit(User user);
+    public void setRole(User user);
 }

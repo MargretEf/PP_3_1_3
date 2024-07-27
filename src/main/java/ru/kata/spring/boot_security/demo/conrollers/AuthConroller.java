@@ -55,11 +55,7 @@ public class AuthConroller {
         if (bindingResult.hasErrors()) {
             return "auth/registration";
         }
-        Set<Role> roles = new HashSet<>();
-        for (Role role : user.getRole()) {
-            roles.add(roleService.findById(role.getId()).get());
-        }
-        user.setRole(roles);
+        peopleService.setRole(user);
 peopleService.register(user);
         return "redirect:/admin/users";
     }
@@ -75,21 +71,8 @@ peopleService.register(user);
 
     @PatchMapping("/edit")
     public String showEditUser(@ModelAttribute("showUser") User user) {
-        Set<Role> roles = new HashSet<>();
-        for (Role role : user.getRole()) {
-            roles.add(roleService.findById(role.getId()).orElse(null));
-        }
-        user.setRole(roles);
-        String password = user.getPassword();
-        String encode = passwordEncoder.encode(password);
-        var currentPassword = peopleService.getUser(user.getId()).getPassword();
-        if (password.equals(currentPassword)) {
-            peopleService.save(user);
-        } else {
-            user.setPassword(encode);
-            peopleService.save(user);
-        }
-
+        peopleService.setRole(user);
+        peopleService.edit(user);
         return "redirect:/admin/users";
     }
 
